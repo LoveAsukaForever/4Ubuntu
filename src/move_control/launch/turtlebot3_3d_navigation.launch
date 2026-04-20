@@ -1,0 +1,46 @@
+<launch>
+  <!-- Arguments -->
+  <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+  <arg name="slam_methods" default="gmapping" doc="slam type [gmapping, cartographer, hector, karto, frontier_exploration]"/>
+  <arg name="map_file" default="$(find move_control)/map/rc25.yaml"/>
+  <arg name="open_rviz" default="true"/>
+  
+  <!-- TurtleBot3 -->
+  <!-- <include file="$(find turtlebot3_bringup)/launch/turtlebot3_remote.launch">
+      <arg name="model" value="$(arg model)" />
+    </include> -->
+
+  <!-- 将 odom 话题转换为 tf 坐标变换 -->
+<!-- 动态发布 odom -> base_link（订阅 /odom 话题） -->
+  <node pkg="move_control" type="tf_odom_to_baselink_node" name="tf_odom_to_baselink_node" output="screen"/>
+
+    <!-- 发布 base_link -> velodyne 静态变换 -->
+  <!-- args="x y z yaw pitch roll parent_frame child_frame period_in_ms" -->
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_mid360" 
+        args="0.285 -0.14 0 0 0 0 base_link mid360 100"/>
+
+
+  <!-- Map server -->
+  <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)">
+      <param name="frame_id" value="world"/>
+  </node>
+
+    <!-- move-base relative -->
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+      <rosparam file="$(find move_control)/config/move_base_config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+      <rosparam file="$(find move_control)/config/move_base_config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+      <rosparam file="$(find move_control)/config/move_base_config/local_costmap_params.yaml" command="load" />
+      <rosparam file="$(find move_control)/config/move_base_config/global_costmap_params.yaml" command="load" />
+      <rosparam file="$(find move_control)/config/move_base_config/base_local_planner_params.yaml" command="load" />
+
+      <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+      <rosparam file="$(find move_control)/config/move_base_config/dwa/dwa_local_planner_params.yaml" command="load" />
+      <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+      <param name="controller_frequency" value="100.0"/>
+  </node>
+
+  <!-- rviz -->
+  <arg name="rviz" default="true"/>
+  <node if="$(arg rviz)" pkg="rviz" type="rviz" name="$(anon rviz)" respawn="false" />
+
+</launch>

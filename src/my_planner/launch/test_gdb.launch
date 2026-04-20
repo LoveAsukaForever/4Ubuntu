@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="my_planner" type="test_gdb" name="test_gdb" output="screen" launch-prefix="gnome-terminal -x gdb --args">
+    </node>
+</launch>
+

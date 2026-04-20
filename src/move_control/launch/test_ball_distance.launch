@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+
+    <node pkg="tf" type="static_transform_publisher" name="map_to_odom" 
+        args="0 0 0 0 0 0 map odom 100"/>
+    <node pkg="move_control" type="robot_fsm_node" name="robot_fsm_node" output="screen"/>     
+
+</launch>

@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="serial_port" default="/dev/ttyACM1"/>
+  <!--
+    Original project wiring:
+      - The unified velocity command line is /robot2/cmd_vel.
+      - Downstream hardware driver (`serial_hw_node`) should consume that topic.
+  -->
+
+  <!-- Also set a global parameter for nodes that read /serial_port -->
+  <param name="serial_port" value="$(arg serial_port)"/>
+
+  <node pkg="serial_hw" name="serial_hw_node" type="serial_hw_node">
+      <param name="serial_port" value="$(arg serial_port)"/>
+  </node>
+
+
+</launch>

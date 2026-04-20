@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <!--
+    仿真 + 本仓库 move_base（输出已 remap 到 /robot2/cmd_vel，经 sim_tb3_gazebo 中 relay 驱动 TB3）。
+    需要代价地图、全局规划等 yaml 与实车一致；无激光时 move_base 可能报警，仅作软件联调。
+  -->
+  <arg name="model" default="burger"/>
+
+  <include file="$(find move_control)/launch/sim_tb3_gazebo.launch">
+    <arg name="model" value="$(arg model)"/>
+  </include>
+
+  <include file="$(find move_control)/launch/run_my_planner.launch"/>
+</launch>

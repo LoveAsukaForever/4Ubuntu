@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Gazebo + 桥接 + 键盘遥控（速度发到 /robot2/cmd_vel，经 relay 到 TB3） -->
+  <arg name="model" default="burger"/>
+
+  <include file="$(find move_control)/launch/sim_tb3_gazebo.launch">
+    <arg name="model" value="$(arg model)"/>
+  </include>
+
+  <node pkg="teleop_twist_keyboard" type="teleop_twist_keyboard.py" name="teleop_robot2"
+        output="screen">
+    <remap from="cmd_vel" to="/robot2/cmd_vel"/>
+  </node>
+</launch>

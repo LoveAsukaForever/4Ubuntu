@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+    
+    <!-- 在精确里程计定义下，odom其实是world->base_link，也即默认world和odom重合，但由于同时需要world -->
+    <node pkg="tf" type="static_transform_publisher" name="world_to_odom" 
+        args="0 0 0 0 0 0 world odom 100"/>
+
+    <!-- 发布虚假odom -->
+    <node pkg="move_control" type="test_pub_odom" name="test_pub_odom" output="screen" />
+
+    <!-- <node pkg="move_control" type="robot_fsm_node" name="robot_fsm_node" output="screen">
+
+    </node> -->
+
+</launch>

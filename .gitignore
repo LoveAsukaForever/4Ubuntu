@@ -1,0 +1,25 @@
+# Catkin / ROS — do not commit build artifacts (rebuild on each machine)
+/build/
+/devel/
+/logs/
+/install/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+
+# Editor / OS
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+
+# Local recordings / plots at workspace root (not Catkin source)
+*.bag
+comm_test*.png
+frames.gv
+frames.pdf
+rosgraph.png

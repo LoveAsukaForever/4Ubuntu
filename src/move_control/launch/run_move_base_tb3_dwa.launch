@@ -1,0 +1,30 @@
+<launch>
+
+  <!--
+    TurtleBot3 (diff-drive) simulation helper:
+    - Use DWAPlannerROS as local planner (robust obstacle avoidance for diff-drive)
+    - Keep existing costmap configs
+    - Remap /cmd_vel -> /robot2/cmd_vel to match this repo's unified cmd interface
+  -->
+
+  <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+    <rosparam file="$(find move_control)/config/move_base_config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+    <rosparam file="$(find move_control)/config/move_base_config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+    <rosparam file="$(find move_control)/config/move_base_config/local_costmap_params.yaml" command="load" />
+    <rosparam file="$(find move_control)/config/move_base_config/global_costmap_params.yaml" command="load" />
+
+    <!-- DWA params tuned for diff-drive simulation -->
+    <rosparam file="$(find move_control)/config/move_base_config/dwa/dwa_local_planner_tb3.yaml" command="load" />
+
+    <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+
+    <!-- Keep reasonable controller frequency for Gazebo -->
+    <param name="controller_frequency" value="10.0" />
+
+    <!-- Unified velocity topic in this repo -->
+    <remap from="/cmd_vel" to="/robot2/cmd_vel" />
+  </node>
+
+</launch>
+

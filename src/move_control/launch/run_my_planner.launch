@@ -1,0 +1,14 @@
+<launch>
+
+    <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen" clear_params="true">
+        <rosparam file="$(find move_control)/config/move_base_config/costmap_common_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find move_control)/config/move_base_config/global_costmap_params.yaml" command="load" ns="global_costmap" />
+        <rosparam file="$(find move_control)/config/move_base_config/costmap_common_params.yaml" command="load" ns="local_costmap" />
+        <rosparam file="$(find move_control)/config/move_base_config/local_costmap_params.yaml" command="load" ns="local_costmap" />
+        <param name="base_global_planner" value="global_planner/GlobalPlanner" />
+        <param name="base_local_planner" value="my_planner/MyPlanner"  />
+        <remap from="/cmd_vel" to="/cmd_vel_nav" />
+        <!-- <remap from="/cmd_vel" to="/cmd_vel_111" /> -->
+    </node>
+
+</launch>

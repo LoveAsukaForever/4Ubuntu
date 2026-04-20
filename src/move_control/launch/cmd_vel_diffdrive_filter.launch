@@ -1,0 +1,3 @@
+<launch>
+  <node pkg="move_control" type="cmd_vel_diffdrive_filter.py" name="cmd_vel_diffdrive_filter" output="screen" />
+</launch>

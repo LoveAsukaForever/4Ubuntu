@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<launch>
+  <!-- Gazebo + 桥接 + rosbag（第 4 章轨迹/速度曲线） -->
+  <arg name="model" default="burger"/>
+  <arg name="bag" default="tb3_sim_run" doc="输出前缀，将生成 bag 文件路径"/>
+
+  <include file="$(find move_control)/launch/sim_tb3_gazebo.launch">
+    <arg name="model" value="$(arg model)"/>
+  </include>
+
+  <!-- 与论文相关的最小话题集；可按需追加 /scan /tf 等 -->
+  <node pkg="rosbag" type="record" name="sim_tb3_rosbag" output="screen"
+        args="-O $(arg bag) /robot2/cmd_vel /cmd_vel /odom /joint_states"/>
+</launch>

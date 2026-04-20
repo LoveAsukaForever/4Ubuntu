@@ -1,0 +1,12 @@
+MyPlanner:
+  robot_frame: /base_link
+  odom_frame: /odom
+  forward_path_num: 10 # 前向探索点，根据分辨率来定,如果局部代价地图分辨率为0.05，那么设置为10时就是10*0.05 = 0.5m的前置搜索距离
+  linear_x_pid: { p: 4.0, i: 0.0, d: 0.5 }
+  linear_y_pid: { p: 4.0, i: 0.0, d: 0.5 }
+  angular_z_pid: { p: 4.0, i: 0.0, d: 0.5 }
+  max_linear_vel_x: 1.0
+  max_linear_vel_y: 1.0
+  max_angular_vel_z: 1.5
+  yaw_threshold: 0.15 # 姿态矫正阈值，单位弧度
+  goal_reached_threshold: 0 # 配置在多少点前暂停 代价地图分辨率为0.05时，也就是5*0.05 = 0.25米的距离前就停下来

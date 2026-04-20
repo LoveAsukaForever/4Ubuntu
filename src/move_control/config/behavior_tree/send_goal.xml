@@ -1,0 +1,7 @@
+<!-- a node for send_goal -->
+<TreeNodeModel>
+    <Action ID="SendGoal" editable="true">
+        <input_port name="goal_pose" type="geometry_msgs::PoseStamped"/>
+    </Action>
+
+</TreeNodeModel>

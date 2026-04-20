@@ -1,0 +1,67 @@
+<!-- 启动这个文件前提是odom里程计已经全部启动 -->
+
+<launch>
+
+  <!-- ===== Hardware: PC <-> STM32 serial ===== -->
+  <arg name="serial_port" default="/dev/ttyACM1"/>
+  <include file="$(find serial_hw)/launch/run_serial_hw.launch">
+    <arg name="serial_port" value="$(arg serial_port)"/>
+  </include>
+
+  <!-- ===== Velocity command source selection =====
+       - use_move_base=true : run move_base, output is remapped to /robot2/cmd_vel
+       - use_move_base=false: rely on external publisher on /cmd_vel, then use v_transfer
+         to convert and publish /robot2/cmd_vel
+    -->
+  <arg name="use_move_base" default="true"/>
+  <include if="$(arg use_move_base)" file="$(find move_control)/launch/run_my_planner.launch"/>
+  <include unless="$(arg use_move_base)" file="$(find move_control)/launch/run_velocity_transfer.launch"/>
+
+  <!-- 发布 base_link -> mid360 静态变换 (parent(source) -> child(target)),
+   source为base_link，target 是 mid360，意味着以后拿到mid360下的坐标，可以通过这个变换直接变换到base_link下 
+    因此tf树中指向的方向是 base_link-> mid360 
+    这也意味着这里设置的xyz yaw pitch roll都是mid360 在 base_link系下的 --> 
+  <!-- args="x y z yaw pitch roll parent_frame child_frame period_in_ms" -->
+<node pkg="tf" type="static_transform_publisher" name="base_link_to_mid360"
+      args="0 0 0  1.57079632679  0  0   base_link mid360  100"/>
+
+  <!-- 将 odom 话题转换为 tf 坐标变换 -->
+   
+  <!-- 动态发布 odom -> base_link（订阅 /odom 话题） -->
+  <node pkg="move_control" type="tf_odom_to_baselink_node" name="tf_odom_to_baselink_node">
+    <param name="lidar_frame" value="mid360" />
+    <param name="base_frame" value="base_link" />
+    <param name="radius" value="0.44"/>
+    <param name="robot_frame" value="odom"/>
+  </node>
+
+
+  <!-- 点云滤波 注意输入点云应该是变换到里程计的点云 -->
+  <!-- <node pkg="move_control" type="pointcloud2_filter_node" name="pointcloud2_filter" respawn="true">
+    <remap from="input" to="/current_pcd"/>
+    <remap from="output" to="/livox/pointcloud2_filtered"/>
+
+    <rosparam>
+      min_x: -0.60     # 后方延伸到 -0.40 m（覆盖底边后部 -0.30 + 裕度）
+      max_x:  0.50     # 前方到 0.50 m（覆盖尖端 0.35 + 雷达 0.14 + 裕度）
+      min_y: -0.45     # 左侧到 -0.45 m（覆盖右后角 -0.397 + 裕度）
+      max_y:  0.50     # 右侧到 0.50 m（覆盖左后角 +0.397 + 雷达 +0.285 + 裕度）
+      min_z: -0.35     # 底部到 -0.35 m（覆盖底盘最低点 + 裕度）
+      max_z:  1.30     # 顶部到 1.30 m（覆盖雷达支架 + 传感器 + 裕度）
+      negative: true   # 移除盒子内的点（车身区域）
+    </rosparam>
+  </node> -->
+
+
+  <!-- run pointcloud_to_laserscan node -->
+  <node pkg="pointcloud_to_laserscan" type="pointcloud_to_laserscan_node" name="pointcloud_to_laserscan" output="screen">
+      <remap from="cloud_in" to="/livox/pointcloud2_filtered"/>
+          <rosparam file="$(find move_control)/config/pointcloud_to_laserscan.yaml" />
+      <remap from="scan" to="/scan"/>                
+  </node>
+
+
+
+
+
+</launch>

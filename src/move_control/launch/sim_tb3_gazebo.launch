@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+  <!--
+    最小 Gazebo 仿真：TurtleBot3 作差速替身，与实车共用 /robot2/cmd_vel 语义。
+    依赖: sudo apt install ros-$ROS_DISTRO-turtlebot3-gazebo ros-$ROS_DISTRO-turtlebot3-description ros-$ROS_DISTRO-topic-tools
+  -->
+  <arg name="model" default="burger" doc="burger | waffle | waffle_pi"/>
+
+  <env name="TURTLEBOT3_MODEL" value="$(arg model)"/>
+
+  <include file="$(find turtlebot3_gazebo)/launch/turtlebot3_empty_world.launch"/>
+
+  <!-- move_base 速度先转到 /cmd_vel_nav，再由 twist_mux 统一输出 /cmd_vel -->
+  <node pkg="topic_tools" type="relay" name="relay_robot2_cmd_vel_to_nav"
+        args="/robot2/cmd_vel /cmd_vel_nav" output="screen"/>
+</launch>
